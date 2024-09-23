@@ -12,7 +12,7 @@ variable "vpc_name" {
 variable "instance_count" {
   type        = number
   description = "Number of EC2 instances"
-  default     = 0
+  default     = 1
 }
 
 variable "db_instance_class" {
