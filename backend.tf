@@ -1,9 +1,9 @@
 terraform {
   backend "s3" {
-    bucket         = var.aws_backend_s3  
+    bucket         = "my-terraform-backend-venkat" 
     key            = "global/s3/terraform.tfstate"
-    region         = var.aws_region                    
-    dynamodb_table = var.aws_backend_rds
+    region         = "ap-south-1"                   
+    dynamodb_table = "my-terraform-backend-rds"
     encrypt        = true          
   }
 }
