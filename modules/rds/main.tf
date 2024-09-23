@@ -2,7 +2,8 @@ resource "aws_db_instance" "default" {
   allocated_storage    = 20
   engine               = "mysql"
   instance_class       = var.db_instance_class
-  db_name                 = "mydb"
+  db_name                 = "mydbterraform"
+  identifier = var.rds_identifier
   username             = "admin"
   password             = "admin123"
   parameter_group_name = "default.mysql8.0"
@@ -13,7 +14,7 @@ resource "aws_db_instance" "default" {
 }
 
 resource "aws_db_subnet_group" "rds_subnet_group" {
-  name       = "rds-subnet-group"
+  name       = "rds-subnet-group2"
   subnet_ids = var.subnet_ids
 }
 

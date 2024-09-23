@@ -15,3 +15,7 @@ variable "db_instance_class" {
 variable "security_group" {
   description = "Security group for the RDS instance"
 }
+
+variable "rds_identifier" {
+  description = "RDS Identifier"
+}

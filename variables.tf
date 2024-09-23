@@ -3,15 +3,6 @@ variable "aws_region" {
   default     = "ap-south-1"
 }
 
-variable "aws_backend_s3" {
-  description = "AWS S3 Bucket for Backend"
-  default = "my-terraform-backend-venkat"
-}
-
-variable "aws_backend_rds" {
-  description = "value"
-  default = ""
-}
 
 variable "vpc_name" {
   description = "VPC ID"
@@ -28,6 +19,12 @@ variable "db_instance_class" {
   type        = string
   description = "The instance class of the RDS instance"
   default     = "db.t3.micro"
+}
+
+variable "rds_identifier" {
+  type = string
+  description = "RDS Identifier"
+  default = "my-rds-db"
 }
 
 variable "alb_name" {
