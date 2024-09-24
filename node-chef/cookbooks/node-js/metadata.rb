@@ -5,7 +5,6 @@ license 'All Rights Reserved'
 description 'Installs/Configures node-js'
 version '0.1.0'
 chef_version '>= 16.0'
-depends 'nginx', '~> 12.0'  # Nginx community cookbook
 
 
 # The `issues_url` points to the location where issues for this cookbook are

@@ -9,13 +9,16 @@ resource "aws_instance" "app" {
 
   provisioner "remote-exec" {
     inline = [
-      "curl -L https://omnitruck.chef.io/install.sh | sudo bash"
+      "echo '43.205.112.151  ip-172-31-36-31.ap-south-1.compute.internal' | sudo tee -a /etc/hosts",
+      
+      # Install Chef Client
+      "curl -L https://omnitruck.chef.io/install.sh | sudo bash",
     ]
 
     connection {
       type        = "ssh"
       user        = "ubuntu"
-      private_key = file("~/demo.pem")
+      private_key = file("modules/ec2/demo.pem")
       host        = self.public_ip
     }
   }

@@ -4,29 +4,36 @@
 #
 # Copyright:: 2024, The Authors, All Rights Reserved.
 # Install Node.js
-package 'nodejs' do
+apt_update 'update' do
+    action :update
+  end
+  
+# Install npm
+package 'npm' do
     action :install
   end
   
-  # Install Nginx
-  include_recipe 'nginx::default'
+  # Ensure Nginx is installed
+  package 'nginx' do
+    action :install
+  end
   
-  # Enable and start Nginx service
   service 'nginx' do
     action [:enable, :start]
   end
   
-  # Clone the Node.js app from GitHub
+  # Clone your Node.js app
   git '/var/www/my_node_app' do
     repository 'https://github.com/Venkat-267/nodejs-jenkins-2'
     revision 'main'
     action :sync
   end
   
-  # Install Node.js dependencies
+  # Install app dependencies
   execute 'npm install' do
     cwd '/var/www/my_node_app'
     command 'npm install'
+    action :run
   end
   
   # Configure Nginx for the Node.js app
