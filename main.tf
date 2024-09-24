@@ -70,6 +70,7 @@ module "rds" {
   security_group = aws_security_group.app_sg.id
   db_instance_class = var.db_instance_class
   rds_identifier = var.rds_identifier
+  
 }
 
 module "alb" {
