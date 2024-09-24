@@ -1,0 +1,14 @@
+[Unit]
+Description=Node.js App
+
+[Service]
+ExecStart=/usr/bin/node /var/www/my_node_app/app.js
+Restart=always
+User=nobody
+Group=nobody
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=production
+WorkingDirectory=/var/www/my_node_app
+
+[Install]
+WantedBy=multi-user.target
