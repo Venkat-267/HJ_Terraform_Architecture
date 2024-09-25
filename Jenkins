@@ -55,14 +55,14 @@ pipeline {
                         // Securely pass the PEM file via environment variable instead of string interpolation
                         withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM'), file(credentialsId: 'admin134', variable: 'CHEF_PEM')]) {
                             sh """
+                            ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} exit || true
                             knife bootstrap ${publicIp} \
                             --connection-user ubuntu \
                             --sudo \
                             --ssh-identity-file $SSH_PEM \
                             --key $CHEF_PEM \
                             --node-name nodejs-app-server \
-                            --run-list 'recipe[node-js]' \
-                            --ssh-verify-host-key accept_new
+                            --run-list 'recipe[node-js]'
                             """
                         }
 
