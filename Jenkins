@@ -62,7 +62,7 @@ pipeline {
                             --key $CHEF_PEM \
                             --node-name nodejs-app-server \
                             --run-list 'recipe[node-js]' \
-                            --ssh-options '-o StrictHostKeyChecking=no'
+                            --ssh-verify-host-key accept_new
                             """
                         }
 
