@@ -56,8 +56,8 @@ pipeline {
                         withCredentials([file(credentialsId: 'demo-pem-as', variable: 'PEM_FILE')]) {
                             sh """
                             knife bootstrap ${publicIp} \
-                            --ssh-user ubuntu \
-                            --identity-file ${PEM_FILE} \
+                            -U ubuntu \   # Use -U instead of --ssh-user
+                            -i ${PEM_FILE} \  # Use -i instead of --identity-file
                             --node-name node-${i} \
                             --sudo \
                             --yes \
