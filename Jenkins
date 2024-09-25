@@ -29,7 +29,7 @@ pipeline {
         stage('Retrieve EC2 IP') {
             steps {
                 script {
-                    def ec2Ip = sh(script: "terraform output -raw ec2_instance_ip", returnStdout: true).trim()
+                    def ec2Ip = sh(script: "terraform output -raw ec2_instance_public_ip", returnStdout: true).trim()
                     echo "EC2 Instance IP: ${ec2Ip}"
                     env.EC2_IP = ec2Ip // Store the IP in an environment variable for later use
                 }
