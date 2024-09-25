@@ -24,7 +24,7 @@ package 'npm' do
   
   # Clone your Node.js app
   git '/var/www/my_node_app' do
-    repository 'https://github.com/Venkat-267/nodejs-jenkins-2'
+    repository 'https://github.com/Venkat-267/nodejs-jenkins-trial'
     revision 'main'
     action :sync
   end

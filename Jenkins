@@ -4,6 +4,7 @@ pipeline {
     environment {
         AWS_ACCESS_KEY_ID = credentials('aws-credentials-id') // Jenkins credential ID
         AWS_SECRET_ACCESS_KEY = credentials('aws-credentials-id') // Jenkins credential ID
+        TF_VAR_SECRET_PEM = credentials('demo-pem-as')
     }
 
     stages {
@@ -24,6 +25,34 @@ pipeline {
                 sh 'terraform apply -auto-approve tfplan'
             }
         }
+
+        stage('Retrieve EC2 IP') {
+            steps {
+                script {
+                    def ec2Ip = sh(script: "terraform output -raw ec2_instance_ip", returnStdout: true).trim()
+                    echo "EC2 Instance IP: ${ec2Ip}"
+                    env.EC2_IP = ec2Ip // Store the IP in an environment variable for later use
+                }
+            }
+        }
+
+        stage('Bootstrap EC2 with Chef') {
+            steps {
+                script {
+                    // Using the stored secret PEM file and the EC2 IP to run the knife bootstrap command
+                    sh """
+                        knife bootstrap ${EC2_IP} \
+                        --ssh-user ubuntu \
+                        --identity-file ${TF_VAR_SECRET_PEM} \
+                        --node-name ec2-node \
+                        --sudo
+                        --run-list 'recipe[node-js]'
+                        --yes
+                    """
+                }
+            }
+        }
+    }
     }
 
     post {
