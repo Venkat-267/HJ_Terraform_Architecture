@@ -56,7 +56,7 @@ pipeline {
                         withCredentials([file(credentialsId: 'demo-pem-as', variable: 'PEM_FILE')]) {
                             sh """
                             knife bootstrap ${publicIp} \
-                            -U ubuntu \   # Use -U instead of --ssh-user
+                            -U ubuntu \  # Use -U instead of --ssh-user
                             -i ${PEM_FILE} \  # Use -i instead of --identity-file
                             --node-name node-${i} \
                             --sudo \
@@ -64,6 +64,7 @@ pipeline {
                             --run-list 'recipe[node-js]'
                             """
                         }
+
                     }
                 }
             }
