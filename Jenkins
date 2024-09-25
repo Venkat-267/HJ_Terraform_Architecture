@@ -30,8 +30,12 @@ pipeline {
             steps {
                 script {
                     // Capture the public IP addresses from Terraform output
-                    def tfOutput = sh(script: 'terraform output -json ec2_instance_public_ip', returnStdout: true).trim()
-                    env.EC2_PUBLIC_IPS = readJSON(text: tfOutput)
+                    def outputEc2PublicIp = sh(script: 'terraform output -json ec2_instance_public_ip', returnStdout: true).trim()
+
+                    def ec2Ips = []
+                    def jsonSlurper = new groovy.json.JsonSlurper()
+                    ec2Ips = jsonSlurper.parseText(outputEc2PublicIp)
+                    env.EC2_PUBLIC_IPS = ec2Ips
                 }
             }
         }
@@ -42,13 +46,15 @@ pipeline {
                     // Iterate over the tuple of IPs and bootstrap each EC2 instance
                     for (int i = 0; i < env.EC2_PUBLIC_IPS.size(); i++) {
                         def publicIp = env.EC2_PUBLIC_IPS[i]
+                        echo "Bootstrapping ${publicIp}"
                         sh """
                         cd /node-chef
                         knife bootstrap ${publicIp} \
-                        --ssh-user ec2-user \
+                        --ssh-user ubuntu \
                         --sudo \
                         --identity-file ${TF_VAR_SECRET_PEM} \
                         --node-name node-${i} \
+                        --yes\
                         --run-list 'recipe[node-js]'
                         """
                     }
