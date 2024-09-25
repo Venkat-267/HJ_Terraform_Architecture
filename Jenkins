@@ -60,9 +60,9 @@ pipeline {
                             --sudo \
                             --ssh-identity-file $SSH_PEM \
                             --key $CHEF_PEM \
-                            --node-name nodejs-1 \
+                            --node-name nodejs-app-server \
                             --run-list 'recipe[node-js]' \
-                            -o StrictHostKeyChecking=no
+                            --ssh-options '-o StrictHostKeyChecking=no'
                             """
                         }
 
@@ -70,6 +70,7 @@ pipeline {
                 }
             }
         }
+
 
     }
 
