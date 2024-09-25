@@ -9,7 +9,7 @@ resource "aws_instance" "app" {
 
   provisioner "remote-exec" {
     inline = [
-      "echo '43.205.112.151  ip-172-31-36-31.ap-south-1.compute.internal' | sudo tee -a /etc/hosts",
+      "echo '43.205.229.221  ip-172-31-36-31.ap-south-1.compute.internal' | sudo tee -a /etc/hosts",
       
       # Install Chef Client
       "curl -L https://omnitruck.chef.io/install.sh | sudo bash",
