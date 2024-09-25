@@ -55,7 +55,7 @@ pipeline {
                         // Securely pass the PEM file via environment variable instead of string interpolation
                         withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM'), file(credentialsId: 'admin134', variable: 'CHEF_PEM')]) {
                             sh """
-                            knife bootstrap 15.207.248.63 \
+                            knife bootstrap ${publicIp} \
                             --connection-user ubuntu \
                             --sudo \
                             --ssh-identity-file $SSH_PEM \
