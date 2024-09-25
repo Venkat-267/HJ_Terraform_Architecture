@@ -53,18 +53,17 @@ pipeline {
                         echo "Bootstrapping ${publicIp}"
 
                         // Securely pass the PEM file via environment variable instead of string interpolation
-                        withCredentials([file(credentialsId: 'demo-pem-as', variable: 'PEM_FILE')]) {
+                        withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM'), file(credentialsId: 'admin134', variable: 'CHEF_PEM')]) {
                             sh """
-                            knife bootstrap ${publicIp} \
+                            knife bootstrap 15.207.248.63 \
                             --connection-user ubuntu \
-                            --sudo\
-                            --ssh-identity-file ${PEM_FILE} \
-                            --node-name node-${i} \
-                            --yes \
+                            --sudo \
+                            --ssh-identity-file $SSH_PEM \
+                            --key $CHEF_PEM \
+                            --node-name nodejs-app-server \
                             --run-list 'recipe[node-js]'
                             """
                         }
-
 
                     }
                 }
