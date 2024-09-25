@@ -55,8 +55,6 @@ pipeline {
                         // Securely pass the PEM file via environment variable instead of string interpolation
                         withCredentials([file(credentialsId: 'demo-pem-as', variable: 'PEM_FILE')]) {
                             sh """
-                            echo '13.233.17.181  ip-172-31-36-31.ap-south-1.compute.internal' | sudo tee -a /etc/hosts
-                            curl -L https://omnitruck.chef.io/install.sh | sudo bash
                             knife bootstrap ${publicIp} \
                             --connection-user ubuntu \
                             --sudo\
