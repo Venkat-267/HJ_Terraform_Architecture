@@ -55,15 +55,15 @@ pipeline {
                         // Securely pass the PEM file via environment variable instead of string interpolation
                         withCredentials([file(credentialsId: 'demo-pem-as', variable: 'PEM_FILE')]) {
                             sh """
-                            knife bootstrap ${publicIp} \
-                            -U ubuntu \  # Use -U instead of --ssh-user
-                            -i ${PEM_FILE} \  # Use -i instead of --identity-file
+                            knife bootstrap ${publicIp} -U ubuntu \
+                            -i ${PEM_FILE} \
                             --node-name node-${i} \
                             --sudo \
                             --yes \
                             --run-list 'recipe[node-js]'
                             """
                         }
+
 
                     }
                 }
