@@ -7,21 +7,21 @@ resource "aws_instance" "app" {
 
   key_name = "demo"
 
-  provisioner "remote-exec" {
-    inline = [
-      "echo '13.233.17.181  ip-172-31-36-31.ap-south-1.compute.internal' | sudo tee -a /etc/hosts",
+  # provisioner "remote-exec" {
+  #   inline = [
+  #     "echo '13.233.17.181  ip-172-31-36-31.ap-south-1.compute.internal' | sudo tee -a /etc/hosts",
       
-      # Install Chef Client
-      "curl -L https://omnitruck.chef.io/install.sh | sudo bash",
-    ]
+  #     # Install Chef Client
+  #     "curl -L https://omnitruck.chef.io/install.sh | sudo bash",
+  #   ]
 
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = file("modules/ec2/demo.pem")
-      host        = self.public_ip
-    }
-  }
+  #   connection {
+  #     type        = "ssh"
+  #     user        = "ubuntu"
+  #     private_key = file("modules/ec2/demo.pem")
+  #     host        = self.public_ip
+  #   }
+  # }
 
   tags = {
     Name = "App-${count.index}"
