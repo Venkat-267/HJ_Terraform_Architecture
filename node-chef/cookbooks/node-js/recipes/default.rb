@@ -1,61 +1,47 @@
-#
-# Cookbook:: node-js
-# Recipe:: default
-#
-# Copyright:: 2024, The Authors, All Rights Reserved.
-# Install Node.js
-apt_update 'update' do
-    action :update
-  end
-  
-# Install npm
-package 'npm' do
-    action :install
-  end
-  
-  # Ensure Nginx is installed
-  package 'nginx' do
-    action :install
-  end
-  
-  service 'nginx' do
-    action [:enable, :start]
-  end
-  
-  # Clone your Node.js app
-  git '/var/www/my_node_app' do
-    repository 'https://github.com/Venkat-267/nodejs-jenkins-trial'
-    revision 'main'
-    action :sync
-  end
-  
-  # Install app dependencies
-  execute 'npm install' do
-    cwd '/var/www/my_node_app'
-    command 'npm install'
-    action :run
-  end
-  
-  # Configure Nginx for the Node.js app
-  template '/etc/nginx/sites-available/default' do
-    source 'nginx-site.erb'
-    notifies :restart, 'service[nginx]', :immediately
-  end
-  
-  # Create Systemd service for Node.js app
-  template '/etc/systemd/system/node-app.service' do
-    source 'node-app.service.erb'
-    notifies :run, 'execute[reload systemd]', :immediately
-  end
-  
-  # Reload systemd to recognize new service
-  execute 'reload systemd' do
-    command 'systemctl daemon-reload'
-    action :nothing
-  end
-  
-  # Enable and start Node.js app as a service
-  service 'node-app' do
-    action [:enable, :start]
-  end
-  
+# Install Node.js and Git
+package 'nodejs'
+package 'git'
+
+# Clone the GitHub repository
+git '/opt/my_node_app' do
+  repository 'https://github.com/Venkat-267/nodejs-jenkins-2'
+  revision 'main'
+  action :sync
+end
+
+# Install npm dependencies
+execute 'install npm dependencies' do
+  command 'npm install'
+  cwd '/opt/my_node_app'
+  action :run
+end
+
+# Create systemd service to run the Node.js app
+file '/etc/systemd/system/nodejs-app.service' do
+  content <<-EOU
+  [Unit]
+  Description=Node.js App
+
+  [Service]
+  ExecStart=/usr/bin/node /opt/my_node_app/app.js
+  Restart=always
+  User=nobody
+  Group=nobody
+  Environment=PATH=/usr/bin:/usr/local/bin
+  Environment=NODE_ENV=production
+  WorkingDirectory=/opt/my_node_app
+
+  [Install]
+  WantedBy=multi-user.target
+  EOU
+  action :create
+end
+
+# Reload systemd and enable the service
+execute 'systemctl daemon-reload' do
+  action :run
+end
+
+service 'nodejs-app' do
+  action [:enable, :start]
+end
