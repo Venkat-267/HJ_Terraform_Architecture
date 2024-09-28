@@ -2,10 +2,11 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCESS_KEY_ID = credentials('aws-credentials-id') // Jenkins credential ID
-        AWS_SECRET_ACCESS_KEY = credentials('aws-credentials-id') // Jenkins credential ID
+        // Use IAM roles for AWS access if running on AWS
+        AWS_ACCESS_KEY_ID = credentials('aws-credentials-id') 
+        AWS_SECRET_ACCESS_KEY = credentials('aws-credentials-id')
         TF_VAR_SECRET_PEM = credentials('demo-pem-as') // PEM file stored as secret
-    } //anyother way to access aws thorugh IAM role
+    }
 
     stages {
         stage('Terraform Init') {
@@ -29,13 +30,9 @@ pipeline {
         stage('Get EC2 IPs') {
             steps {
                 script {
-                    // Capture the public IP addresses from Terraform output
                     def outputEc2PublicIp = sh(script: 'terraform output -json ec2_instance_public_ip', returnStdout: true).trim()
-
                     def jsonSlurper = new groovy.json.JsonSlurper()
                     def ec2Ips = jsonSlurper.parseText(outputEc2PublicIp)
-
-                    // Serialize EC2 IPs to be passed as environment variable
                     env.EC2_PUBLIC_IPS = ec2Ips.collect { it }.join(',')
                 }
             }
@@ -44,38 +41,33 @@ pipeline {
         stage('Knife Bootstrap') {
             steps {
                 script {
-                    // Convert the serialized EC2 IPs back to a list
                     def ec2Ips = env.EC2_PUBLIC_IPS.split(',')
-
-                    // Iterate over the list of IPs and bootstrap each EC2 instance
-                    for (int i = 0; i < ec2Ips.size(); i++) {
-                        def publicIp = ec2Ips[i]
+                    for (publicIp in ec2Ips) {
                         echo "Bootstrapping ${publicIp}"
 
-                        // Securely pass the PEM file via environment variable instead of string interpolation
                         withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM')]) {
-                    // Add the -o option to auto-accept the SSH fingerprint.
-                            sh """
-                            ssh -o StrictHostKeyChecking=no -i $SSH_PEM ubuntu@${publicIp} exit || true
-                            knife bootstrap ${publicIp} \
-                            --connection-user ubuntu \
-                            --sudo \
-                            --ssh-identity-file $SSH_PEM \
-                            --node-name nodejs-app-server \
-                            --run-list 'recipe[node-js]' \
-                            --yes \
-                            --chef-license accept \
-                            --server-url "https://ec2-13-234-77-4.ap-south-1.compute.amazonaws.com/organizations/orgs"
-                            """
+                            try {
+                                // Check SSH connection before bootstrapping
+                                sh """
+                                ssh -o StrictHostKeyChecking=no -i $SSH_PEM ubuntu@${publicIp} exit || true
+                                knife bootstrap ${publicIp} \
+                                --connection-user ubuntu \
+                                --sudo \
+                                --ssh-identity-file $SSH_PEM \
+                                --node-name nodejs-app-server \
+                                --run-list 'recipe[node-js]' \
+                                --yes \
+                                --chef-license accept \
+                                --server-url "https://ec2-13-234-77-4.ap-south-1.compute.amazonaws.com/organizations/orgs"
+                                """
+                            } catch (Exception e) {
+                                echo "Failed to bootstrap ${publicIp}: ${e.message}"
+                            }
                         }
-
                     }
                 }
             }
         }
-
-
-
     }
 
     post {
