@@ -5,7 +5,7 @@ pipeline {
         AWS_ACCESS_KEY_ID = credentials('aws-credentials-id') // Jenkins credential ID
         AWS_SECRET_ACCESS_KEY = credentials('aws-credentials-id') // Jenkins credential ID
         TF_VAR_SECRET_PEM = credentials('demo-pem-as') // PEM file stored as secret
-    }
+    } //anyother way to access aws thorugh IAM role
 
     stages {
         stage('Terraform Init') {
@@ -53,7 +53,8 @@ pipeline {
                         echo "Bootstrapping ${publicIp}"
 
                         // Securely pass the PEM file via environment variable instead of string interpolation
-                        withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM'), file(credentialsId: 'admin134', variable: 'CHEF_PEM')]) {
+                        withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM'), 
+                                 file(credentialsId: 'admin134', variable: 'CHEF_PEM')]) {
                             // Add the -o option to auto-accept the SSH fingerprint.
                             sh """
                             ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} exit || true
@@ -63,7 +64,10 @@ pipeline {
                             --ssh-identity-file $SSH_PEM \
                             --node-name nodejs-app-server \
                             --run-list 'recipe[node-js]' \
-                            --yes
+                            --yes \
+                            --client-key $CHEF_PEM \
+                            --chef-license accept \
+                            --server-url "https://ec2-13-234-77-4.ap-south-1.compute.amazonaws.com/organizations/orgs"
                             """
                         }
 

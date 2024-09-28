@@ -1,47 +1,69 @@
-# Install Node.js and Git
+# recipes/default.rb
+
+# Update apt package index
+execute 'apt-get update' do
+  command 'apt-get update'
+end
+
+# Install Node.js and npm
 package 'nodejs'
+package 'npm'
+
+# Install Git
 package 'git'
 
-# Clone the GitHub repository
-git '/opt/my_node_app' do
+# Clone Node.js application from GitHub
+git '/home/ubuntu/app' do
   repository 'https://github.com/Venkat-267/nodejs-jenkins-2'
   revision 'main'
   action :sync
+  user 'ubuntu'
 end
 
-# Install npm dependencies
-execute 'install npm dependencies' do
+# Install dependencies for the Node.js app
+execute 'npm install' do
+  cwd '/home/ubuntu/app'
   command 'npm install'
-  cwd '/opt/my_node_app'
-  action :run
+  user 'ubuntu'
 end
 
-# Create systemd service to run the Node.js app
-file '/etc/systemd/system/nodejs-app.service' do
+# Start the Node.js application
+execute 'start nodejs app' do
+  cwd '/home/ubuntu/app'
+  command 'npm start &'
+  user 'ubuntu'
+end
+
+file '/etc/systemd/system/nodeapp.service' do
   content <<-EOU
   [Unit]
   Description=Node.js App
 
   [Service]
-  ExecStart=/usr/bin/node /opt/my_node_app/app.js
+  ExecStart=/usr/bin/npm start
+  WorkingDirectory=/home/ubuntu/app
   Restart=always
-  User=nobody
-  Group=nobody
+  User=ubuntu
+  Group=ubuntu
   Environment=PATH=/usr/bin:/usr/local/bin
   Environment=NODE_ENV=production
-  WorkingDirectory=/opt/my_node_app
+  ExecReload=/bin/kill -s HUP $MAINPID
+  KillMode=process
+  KillSignal=SIGINT
+  TimeoutStopSec=10
 
   [Install]
   WantedBy=multi-user.target
   EOU
-  action :create
+  mode '0644'
 end
 
-# Reload systemd and enable the service
-execute 'systemctl daemon-reload' do
-  action :run
+# Reload systemd to register the service
+execute 'reload systemd' do
+  command 'systemctl daemon-reload'
 end
 
-service 'nodejs-app' do
+# Enable and start the service
+service 'nodeapp' do
   action [:enable, :start]
 end
