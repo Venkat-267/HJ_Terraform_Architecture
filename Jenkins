@@ -53,11 +53,10 @@ pipeline {
                         echo "Bootstrapping ${publicIp}"
 
                         // Securely pass the PEM file via environment variable instead of string interpolation
-                        withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM'), 
-                                 file(credentialsId: 'admin134', variable: 'CHEF_PEM')]) {
-                            // Add the -o option to auto-accept the SSH fingerprint.
+                        withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM')]) {
+                    // Add the -o option to auto-accept the SSH fingerprint.
                             sh """
-                            ssh -o StrictHostKeyChecking=no ubuntu@${publicIp} exit || true
+                            ssh -o StrictHostKeyChecking=no -i $SSH_PEM ubuntu@${publicIp} exit || true
                             knife bootstrap ${publicIp} \
                             --connection-user ubuntu \
                             --sudo \
@@ -65,7 +64,6 @@ pipeline {
                             --node-name nodejs-app-server \
                             --run-list 'recipe[node-js]' \
                             --yes \
-                            --client-key $CHEF_PEM \
                             --chef-license accept \
                             --server-url "https://ec2-13-234-77-4.ap-south-1.compute.amazonaws.com/organizations/orgs"
                             """
