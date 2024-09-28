@@ -48,8 +48,13 @@ pipeline {
                         withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM')]) {
                             try {
                                 // Check SSH connection before bootstrapping
-                                sh """
-                                ssh -o StrictHostKeyChecking=no -i $SSH_PEM ubuntu@${publicIp} exit || true
+                                def sshCheck = sh(script: "ssh -o StrictHostKeyChecking=no -i $SSH_PEM ubuntu@${publicIp} exit", returnStatus: true)
+                                if (sshCheck != 0) {
+                                    error "SSH connection failed for ${publicIp}"
+                                }
+
+                                // Perform Knife bootstrap
+                                def knifeResult = sh(script: """
                                 knife bootstrap ${publicIp} \
                                 --connection-user ubuntu \
                                 --sudo \
@@ -59,7 +64,12 @@ pipeline {
                                 --yes \
                                 --chef-license accept \
                                 --server-url "https://ec2-13-234-77-4.ap-south-1.compute.amazonaws.com/organizations/orgs"
-                                """
+                                """, returnStatus: true)
+
+                                if (knifeResult != 0) {
+                                    error "Failed to bootstrap ${publicIp}, exit code: ${knifeResult}"
+                                }
+
                             } catch (Exception e) {
                                 echo "Failed to bootstrap ${publicIp}: ${e.message}"
                             }
