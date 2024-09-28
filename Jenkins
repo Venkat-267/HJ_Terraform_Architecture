@@ -39,18 +39,20 @@ pipeline {
 
         stage('Knife Bootstrap') {
             steps {
-                def ec2Ips = env.EC2_PUBLIC_IPS.split(',')
+                script {
+                    def ec2Ips = env.EC2_PUBLIC_IPS.split(',')
 
-                for (String publicIp : ec2Ips) {
+                    for (String publicIp : ec2Ips) {
                         echo "Bootstrapping ${publicIp}"
                         withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM'),
-                                        file(credentialsId: 'admin134', variable: 'VALIDATION_KEY')]) {
+                                         file(credentialsId: 'admin134', variable: 'VALIDATION_KEY')]) {
                             sh """
                                 ssh -o StrictHostKeyChecking=no -i ${SSH_PEM} ubuntu@${publicIp} exit
                                 knife bootstrap ${publicIp} --connection-user ubuntu --sudo --ssh-identity-file ${SSH_PEM} --node-name nodejs-app-server-0 --run-list recipe[node-js] --yes --chef-license accept --server-url https://ec2-13-234-77-4.ap-south-1.compute.amazonaws.com/organizations/orgs --ssh-user ubuntu --bootstrap-version 17.9.0 --key ${VALIDATION_KEY}
                             """
                         }
                     }
+                }
             }
         }
     }
