@@ -58,7 +58,7 @@ pipeline {
                             --connection-user ubuntu \
                             --sudo \
                             --ssh-identity-file $SSH_PEM \
-                            --node-name nodejs-app-server-${i} \  // Use unique node names for each instance
+                            --node-name nodejs-app-server-${i} \
                             --run-list 'recipe[node-js]' \
                             --yes \
                             --chef-license accept \
