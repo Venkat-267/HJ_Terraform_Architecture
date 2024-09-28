@@ -58,13 +58,12 @@ pipeline {
                             --connection-user ubuntu \
                             --sudo \
                             --ssh-identity-file $SSH_PEM \
-                            --node-name nodejs-app-server \
+                            --node-name nodejs-app-server-${i} \  // Use unique node names for each instance
                             --run-list 'recipe[node-js]' \
                             --yes \
                             --chef-license accept \
                             --server-url "https://ec2-13-234-77-4.ap-south-1.compute.amazonaws.com/organizations/orgs" \
                             --ssh-user ubuntu \
-                            --chef-client-path '/opt/chef/bin/chef-client' \
                             --bootstrap-version '17.9.0' \
                             --validation-client-name orgs-validator \
                             --validation-key $CLIENT_PEM  // Specify the validation key
@@ -74,6 +73,7 @@ pipeline {
                 }
             }
         }
+
 
     }
 
