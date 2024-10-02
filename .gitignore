@@ -2,7 +2,7 @@
 *.tfstate
 *.tfstate.backup
 ## Ignore Chef related files and secrets
-
+.pem
 .chef/encrypted_data_bag_secret
 
 ## Ignore Chef-Zero files
