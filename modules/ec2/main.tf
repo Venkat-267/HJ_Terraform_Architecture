@@ -7,20 +7,6 @@ resource "aws_instance" "app" {
 
   key_name = "demo"
 
-  provisioner "remote-exec" {
-    inline = [
-      "echo '3.6.37.120 ip-172-31-36-31.ap-south-1.compute.internal' | sudo tee -a /etc/hosts",
-      
-      "curl -L https://omnitruck.chef.io/install.sh | sudo bash",
-    ]
-
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = file("modules/ec2/demo.pem")
-      host        = self.public_ip
-    }
-  }
 
   tags = {
     Name = "App-${count.index}"

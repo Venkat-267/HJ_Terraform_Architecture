@@ -11,19 +11,19 @@ pipeline {
     stages {
         stage('Terraform Init') {
             steps {
-                echo 'terraform init'
+                sh 'terraform init'
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                echo 'terraform plan -out=tfplan'
+                sh 'terraform plan -out=tfplan'
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                sh 'terraform apply -auto-approve'
+                sh 'terraform apply --auto-approve tfplan'
             }
         }
 
@@ -51,6 +51,8 @@ pipeline {
                         withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM'),
                                         file(credentialsId: 'admin134', variable: 'VALIDATION_KEY')]) {
                             sh """
+                                echo '3.6.37.120 ip-172-31-36-31.ap-south-1.compute.internal' | sudo tee -a /etc/hosts
+                                curl -L https://omnitruck.chef.io/install.sh | sudo bash
                                 knife ssl fetch -s https://ip-172-31-36-31.ap-south-1.compute.internal/organizations/orgs \
                                 -k ${VALIDATION_KEY}
                                 knife bootstrap ${publicIp} \
