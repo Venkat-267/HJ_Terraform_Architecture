@@ -9,7 +9,7 @@ resource "aws_instance" "app" {
 
   provisioner "remote-exec" {
     inline = [
-      "echo '13.234.77.4 ip-172-31-36-31.ap-south-1.compute.internal' | sudo tee -a /etc/hosts",
+      "echo '3.6.37.120 ip-172-31-36-31.ap-south-1.compute.internal' | sudo tee -a /etc/hosts",
       
       "curl -L https://omnitruck.chef.io/install.sh | sudo bash",
     ]

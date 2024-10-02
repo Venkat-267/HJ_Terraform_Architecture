@@ -5,12 +5,18 @@ execute 'apt-get update' do
   command 'apt-get update'
 end
 
-# Install Node.js and npm
-package 'nodejs'
-package 'npm'
+# Install Node.js, npm, and Git
+package 'nodejs' do
+  action :install
+end
 
-# Install Git
-package 'git'
+package 'npm' do
+  action :install
+end
+
+package 'git' do
+  action :install
+end
 
 # Clone Node.js application from GitHub
 git '/home/ubuntu/app' do
@@ -27,13 +33,7 @@ execute 'npm install' do
   user 'ubuntu'
 end
 
-# Start the Node.js application
-execute 'start nodejs app' do
-  cwd '/home/ubuntu/app'
-  command 'npm start &'
-  user 'ubuntu'
-end
-
+# Create a systemd service file for the Node.js application
 file '/etc/systemd/system/nodeapp.service' do
   content <<-EOU
   [Unit]
