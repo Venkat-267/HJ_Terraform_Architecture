@@ -56,13 +56,12 @@ pipeline {
                                 --sudo \
                                 --ssh-identity-file ${SSH_PEM} \
                                 --node-name nodejs-app-server-0 \
-                                --run-list recipe[node-js] \
-                                --yes \
-                                --chef-license accept \
-                                --server-url https://ip-172-31-36-31.ap-south-1.compute.internal/organizations/orgs \
-                                --bootstrap-version 17.9.0 \
-                                --key ${VALIDATION_KEY} \
-                                --ssl-verify-mode none
+                                --run-list "recipe[node-js]" \
+                                --server-url "https://ip-172-31-36-31.ap-south-1.compute.internal/organizations/orgs" \
+                                --user "admin134" \
+                                -k ${VALIDATIOM_KEY} \
+                                --bootstrap-version 15.0 \
+                                --yes
                             """
                         }
                     }
