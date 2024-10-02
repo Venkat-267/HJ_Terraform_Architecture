@@ -59,7 +59,7 @@ pipeline {
                                 --run-list "recipe[node-js]" \
                                 --server-url "https://ip-172-31-36-31.ap-south-1.compute.internal/organizations/orgs" \
                                 --user "admin134" \
-                                -k ${VALIDATIOM_KEY} \
+                                -k ${VALIDATION_KEY} \
                                 --bootstrap-version 15.0 \
                                 --yes
                             """
