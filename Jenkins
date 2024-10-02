@@ -11,19 +11,19 @@ pipeline {
     stages {
         stage('Terraform Init') {
             steps {
-                sh 'terraform init'
+                echo 'terraform init'
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan -out=tfplan'
+                echo 'terraform plan -out=tfplan'
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                sh 'terraform apply -auto-approve tfplan'
+                sh 'terraform apply -auto-approve'
             }
         }
 
@@ -51,6 +51,8 @@ pipeline {
                         withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM'),
                                         file(credentialsId: 'admin134', variable: 'VALIDATION_KEY')]) {
                             sh """
+                                knife ssl fetch -s https://ip-172-31-36-31.ap-south-1.compute.internal/organizations/orgs \
+                                -k ${VALIDATION_KEY}
                                 knife bootstrap ${publicIp} \
                                 --connection-user ubuntu \
                                 --sudo \
