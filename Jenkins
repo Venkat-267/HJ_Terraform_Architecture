@@ -51,7 +51,7 @@ pipeline {
                         withCredentials([file(credentialsId: 'demo-pem-as', variable: 'SSH_PEM'),
                                         file(credentialsId: 'admin134', variable: 'VALIDATION_KEY')]) {
                             sh """
-                                echo '3.6.37.120 ip-172-31-36-31.ap-south-1.compute.internal' | sudo tee -a /etc/hosts
+                                echo '43.205.114.3 ip-172-31-36-31.ap-south-1.compute.internal' | sudo tee -a /etc/hosts
                                 curl -L https://omnitruck.chef.io/install.sh | sudo bash
                                 knife ssl fetch -s https://ip-172-31-36-31.ap-south-1.compute.internal/organizations/orgs \
                                 -k ${VALIDATION_KEY}
